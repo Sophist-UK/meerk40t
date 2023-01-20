@@ -30,7 +30,7 @@ The channel callable is given any additional information about the gcode.
 import re
 from math import isnan
 
-from meerk40t.core.node.node import Linejoin, Linecap
+from meerk40t.core.node.node import Linecap, Linejoin
 from meerk40t.core.node.op_engrave import EngraveOpNode
 from meerk40t.core.units import UNITS_PER_INCH, UNITS_PER_MM, UNITS_PER_PIXEL, Length
 from meerk40t.svgelements import Arc, Color, Matrix, Move, Path
