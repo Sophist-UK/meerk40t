@@ -10,15 +10,14 @@ from ctypes import windll
 
 LPDWORD = ctypes.POINTER(wintypes.DWORD)
 LPOVERLAPPED = wintypes.LPVOID
+LPSECURITY_ATTRIBUTES = wintypes.LPVOID
 
 
 class WinConnection:
     def __init__(self, channel):
         self.channel = channel
-        self.devices = {}
-        self.interface = {}
-        self.backend_error_code = None
         self.timeout = 100
+        self.handle = None
         self.DeviceIoControl_Fn = windll.kernel32.DeviceIoControl
         self.DeviceIoControl_Fn.argtypes = [
             wintypes.HANDLE,  # _In_          HANDLE hDevice
@@ -30,6 +29,18 @@ class WinConnection:
             LPDWORD,  # _Out_opt_     LPDWORD lpBytesReturned
             LPOVERLAPPED,
         ]  # _Inout_opt_   LPOVERLAPPED lpOverlapped
+        self.CreateMutexW_Fn = windll.kernel32.CreateMutexW
+        self.CreateMutexW.argtypes = [
+            LPSECURITY_ATTRIBUTES,  # _In_opt_      LPSECURITY_ATTRIBUTES lpSecurityAttributes
+            wintypes.DWORD,  # _In_          DWORD dwCreationDisposition
+            wintypes.HANDLE]  # _In_opt_      HANDLE hTemplateFile
+        self.CreateFile_Fn.restype = wintypes.HANDLE
+
+    def open(self, handle, data):
+        self.handle = windll.kernel32.CreateMutexW(LPSECURITY_ATTRIBUTES, 0, "Mio_MutexDevio")
+
+    def close(self):
+        windll.kernel32.CloseHandle(self.handle)
 
     def command(self, handle, data):
         dwBytesReturned = wintypes.DWORD(0)
