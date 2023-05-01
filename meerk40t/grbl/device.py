@@ -509,6 +509,8 @@ class GRBLDevice(Service, ViewPort):
             input_type=None,
         )
         def estop(command, channel, _, data=None, remainder=None, **kwgs):
+            if self.driver.paused:
+                self.driver.resume()
             self.driver.reset()
             self.signal("pipe;running", False)
             self.signal("pause")
